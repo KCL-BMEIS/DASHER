@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pipeline xmlns="http://nrg.wustl.edu/pipeline" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nrgString="java:org.nrg.pipeline.utils.StringUtils" xsi:schemaLocation="http://nrg.wustl.edu/pipeline ..\schema\pipeline.xsd">
+    <name>delete_dicom_files</name>
+    <location>/data/xnat/scripts/pipelines</location>
+    <description>Deletes dicom files </description>
+    <documentation>
+        <authors>
+            <author>
+                <lastname>Daniel</lastname>
+                <firstname>Beasley</firstname>
+            </author>
+        </authors>
+        <version>1</version>
+        <input-parameters>
+            <parameter>
+                <name>session_label</name>
+                <values>
+                    <schemalink>xnat:experimentData.label</schemalink>
+                </values>
+                <description>The experiments  label</description>
+            </parameter>
+            
+            <parameter>
+                <name>xnat_project</name>
+                <values>
+                    <schemalink>xnat:experimentData.project</schemalink>
+                </values>
+                <description>The experiments project id</description>
+            </parameter>
+
+              <parameter>
+                <name>delete_all</name>
+                <values>
+                    <csv>Y,N</csv>
+                </values>
+                <description>Set the value to Y if you want to delet ALL dicom files on XNAT</description>
+            </parameter>
+
+        
+        </input-parameters>
+    </documentation>
+
+
+    <outputFileNamePrefix>^concat("/data/xnat/cache/temp/",/Pipeline/parameters/parameter[name='session_id']/values/unique/text(),'/',/Pipeline/name/text())^</outputFileNamePrefix>
+    <parameters>
+    </parameters>
+    <steps>
+      <step description="Delete Subject" id="1" >
+            <resource location="/data/xnat/scripts/pipelines/resources" name="delete_dicom_files">
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='xnat_project']/values/unique/text()^</value>
+                </argument>
+                
+                 <argument id="sessionlabel">
+                    <value>^/Pipeline/parameters/parameter[name='session_label']/values/unique/text()^</value>
+                </argument>
+                <argument id="deleteall">
+                    <value>^/Pipeline/parameters/parameter[name='delete_all']/values/unique/text()^</value>
+                </argument>
+              
+            </resource>
+        </step>
+
+    </steps>
+</Pipeline>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pipeline xmlns="http://nrg.wustl.edu/pipeline" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nrgString="java:org.nrg.pipeline.utils.StringUtils" xsi:schemaLocation="http://nrg.wustl.edu/pipeline ..\schema\pipeline.xsd">
+    <name>process_rtstruct_pipeline</name>
+    <location>/data/xnat/scripts/pipelines</location>
+    <description>Converts RTSTRUCT scans to assessors and extracts and checks roi labels </description>
+    <documentation>
+        <authors>
+            <author>
+                <lastname>Daniel</lastname>
+                <firstname>Beasley</firstname>
+            </author>
+        </authors>
+        <version>1</version>
+        <input-parameters>
+            <parameter>
+                <name>session_id</name>
+                <values>
+                    <schemalink>xnat:imageSessionData/ID</schemalink>
+                </values>
+                <description>The experiments id</description>
+            </parameter>
+            <parameter>
+                <name>session_label</name>
+                <values>
+                    <schemalink>xnat:experimentData.label</schemalink>
+                </values>
+                <description>The experiments label</description>
+            </parameter>
+
+
+            <parameter>
+                <name>xnat_project</name>
+                <values>
+                    <schemalink>xnat:experimentData.project</schemalink>
+                </values>
+                <description>The experiments project id</description>
+            </parameter>
+
+        </input-parameters>
+    </documentation>
+
+
+    <outputFileNamePrefix>^concat("/data/xnat/cache/temp/",/Pipeline/parameters/parameter[name='session_label']/values/unique/text(),'/',/Pipeline/name/text())^</outputFileNamePrefix>
+    <parameters>
+    </parameters>
+    <steps>
+      <step description="Trigger python script to process RT STRUCT files" id="1" >
+            <resource location="/data/xnat/scripts/pipelines/resources" name="process_rtstruct">
+
+                <argument id="subject_id">
+                    <value>^/Pipeline/parameters/parameter[name='subject_id']/values/unique/text()^</value>
+                </argument>
+                <argument id="session_id">
+                 <value>^/Pipeline/parameters/parameter[name='session_id']/values/unique/text()^</value>
+                </argument>
+                <argument id="session_label">
+                    <value>^/Pipeline/parameters/parameter[name='session_label']/values/unique/text()^</value>
+                </argument>
+                 <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='xnat_project']/values/unique/text()^</value>
+                </argument>
+            
+
+            </resource>
+        </step>
+        <!--step description="Write CT subject and sesion ids to XNAT" id="2" >
+            <resource location="/data/xnat/scripts/pipelines/resources" name="xapi_rest">
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='xnat_project']/values/unique/text()^</value>
+                </argument>
+                <argument id="ctsubject">
+                    <value>^/Pipeline/parameters/parameter[name='ct_subject']/values/unique/text()^</value>
+                </argument>
+                <argument id="ctsession">
+                 <value>^/Pipeline/parameters/parameter[name='ct_session']/values/unique/text()^</value>
+                </argument>
+                <argument id="session">
+                    <value>^/Pipeline/parameters/parameter[name='sessionLabel']/values/unique/text()^</value>
+                </argument>
+                <argument id="user">
+                  <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                </argument>
+                <argument id="pwd">
+                    <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                </argument>
+
+            </resource>
+        </step-->
+    </steps>
+</Pipeline>

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Application-Name: Uploader automatic Dicom routing
+Build-Date: Tue Nov 05 12:06:50 GMT 2019
+Build-Number: Manual
+

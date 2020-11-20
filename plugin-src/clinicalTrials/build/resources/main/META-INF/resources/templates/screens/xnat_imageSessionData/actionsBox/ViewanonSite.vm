@@ -1,0 +1,39 @@
+<!-- BEGIN: templates/screens/xnat_imageSessionData/actionsBox/viewAnonSite.vm -->
+<!-- Sequence: 1 -->
+<li class="yuimenuitem" id=demo >
+
+</li>
+
+
+<script type="text/javascript">
+var p = "${project}";
+var txt = "View Anonymised Site"
+var protocol = location.protocol;
+var slashes = protocol.concat("//");
+var host = slashes.concat(window.location.hostname);
+
+var port = "8082"
+#if($host.contains("https"))
+port = "444"
+#end
+
+
+
+var port = "8082"
+if( host.includes("https")) {
+    port = "444"
+}
+
+
+document.getElementById("demo").innerHTML = "<a  target=\"_blank\" href=" + host + ":" + port + "/anon/app/template/Index.vm /><div class=\"ic_spacer\">&nbsp;</div>" + txt + "</a>";
+
+
+</script>
+
+
+
+
+
+</script>
+
+<!-- END: templates/screens/xnat_imageSessionData/actionsBox/viewAnonSite.vm -->

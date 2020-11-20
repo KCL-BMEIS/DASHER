@@ -1,0 +1,105 @@
+FROM  ubuntu:18.04
+FROM  ubuntu:18.04
+
+#PROXY - fill in ip:port of proxy
+#ENV http_proxy   "@PROXYURL@:@PROXYPORT@"
+#ENV HTTP_PROXY   "@PROXYURL@:@PROXYPORT@"
+#ENV https_proxy  "@PROXYURL@:@PROXYPORT@"
+#ENV HTTPS_PROXY  "@PROXYURL@:@PROXYPORT@"
+#ENV ftp_proxy    "@PROXYURL@:@PROXYPORT@"
+#ENV FTP_PROXY    "@PROXYURL@:@PROXYPORT@"
+#ENV no_proxy    "localhost,127.0.0.1,xnat-web1,xnat-web2"
+#ENV NO_PROXY    "localhost,127.0.0.1,xnat-web1,xnat-web2"
+
+
+# Fix sh
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN apt-get update && apt-get -y install dcmtk  dos2unix openjdk-8-jdk mc cron curl python3 python3-pip zip jq postgresql-client
+RUN ln -s /usr/lib/jvm/java-8-openjdk-amd64/ /opt/jdk8
+
+ADD apache-tomcat-7.0.91.tar.gz /opt/
+RUN ln -s /opt/apache-tomcat-7.0.91/ /opt/tomcat7
+
+ADD DicomBrowser-1.5.2.tgz /opt
+ADD scripts.tar /opt
+
+
+RUN mkdir /data /data/xnat
+RUN adduser --quiet --disabled-password --shell /bin/bash --home /data/xnat/home/ --gecos "User" xnat
+RUN mkdir /data/xnat/home/config /data/xnat/home/logs /data/xnat/home/plugins /data/xnat/home/work
+RUN mkdir /data/xnat/archive /data/xnat/build /data/xnat/cache /data/xnat/ftp /data/xnat/prearchive
+
+ADD catalina.sh /opt/tomcat7/bin/
+ADD setenv.sh /opt/tomcat7/bin
+ADD tomcat-users.xml /opt/tomcat7/conf/
+RUN chmod 775 /opt/tomcat7/bin/setenv.sh /opt/tomcat7/bin/catalina.sh
+
+
+# Add files
+ADD tomcat-users.xml /opt/tomcat7/conf/
+ADD conf1/xnat-conf.properties /data/xnat/home/config
+ADD conf1/prefs-init.ini /data/xnat/home/config
+ADD conf1/siteConfig.txt /data/xnat/home
+ADD conf1/setup-xnat.sh /data/xnat/
+ADD conf1/upload-resources.sh /data/xnat/
+ADD xnat.cfg /data/xnat/home
+ADD cronjobs.txt /data/xnat
+ADD setenv.sh /opt/tomcat7/bin/
+ADD bash_profile /opt/
+
+RUN dos2unix  /opt/tomcat7/bin/*
+RUN dos2unix  /opt/bash_profile
+
+#set xnat user and env variables
+ENV TOMCAT_USER xnat
+ENV CATALINA_HOME /opt/tomcat7
+ENV JAVA_HOME /opt/jdk8
+ENV PATH $PATH:$CATALINA_HOME/bin
+
+
+RUN cat /opt/bash_profile >> /data/xnat/home/.bash_profile
+RUN cat /opt/bash_profile >> ~/.bash_profile
+RUN chown -R xnat:xnat /data
+
+
+
+#install xnat.war and remove inbuilt viewer BUT need to change session page
+RUN cd /opt/ && curl -L -o /opt/ROOT.war  https://bitbucket.org/xnatdev/xnat-web/downloads/xnat-web-1.7.4.1.war
+RUN zip -d /opt/ROOT.war /WEB-INF/lib/ximgview-plugin-1.0.0.jar
+# mv to webapps in set-up script
+
+
+ADD pipeline-installer.tar.gz /opt
+RUN dos2unix /opt/pipeline-installer/xnat-pipeline/gradle.properties
+ADD conf1/gradle.properties /opt/pipeline-installer/xnat-pipeline
+ADD gradle-4.1 /opt/pipeline-installer/xnat-pipeline/gradle/wrapper/gradle-4.1
+RUN cd /opt/pipeline-installer/xnat-pipeline/gradle/wrapper/ && zip -r gradle-4.1-bin.zip gradle-4.1
+RUN chown -R xnat:xnat /opt
+RUN dos2unix /opt/pipeline-installer/xnat-pipeline/*
+RUN su - xnat -c 'export JAVA_HOME="/opt/jdk8" && export PATH="$JAVA_HOME/bin:$PATH" && cd /opt/pipeline-installer/xnat-pipeline && dos2unix * && ./gradlew   -Dhttps.protocols=TLSv1.1,TLSv1.2 '
+
+
+ADD conf1/AutoRun.xml /data/xnat/pipeline/catalog/xnat_tools/
+
+EXPOSE 8080
+EXPOSE 8009
+EXPOSE 8104
+
+WORKDIR /opt/tomcat7
+RUN dos2unix /data/xnat/*
+RUN dos2unix /opt/scripts/*
+RUN chmod 775 /data/xnat/setup-xnat.sh
+RUN chmod 775 /data/xnat/upload-resources.sh
+RUN chmod -R 770 /data/xnat/home
+
+
+RUN apt-get update
+RUN pip3 install pydicom docopt lxml requests
+RUN cp /opt/scripts/pg_backup.config1 /opt/scripts/pg_backup.config
+
+
+# Launch Tomcat
+CMD ["/data/xnat/setup-xnat.sh", ">/data/xnat/scripts/logs/setup-xnat.log"]
+
+
+

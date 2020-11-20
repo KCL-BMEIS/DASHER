@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pipeline xmlns="http://nrg.wustl.edu/pipeline" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nrgString="java:org.nrg.pipeline.utils.StringUtils" xsi:schemaLocation="http://nrg.wustl.edu/pipeline ..\schema\pipeline.xsd">
+    <name>anonymise</name>
+    <location>/data/xnat/scripts/pipelines</location>
+    <description>Pseudonymise Session for Research or Clinical Trials</description>
+    <documentation>
+        <authors>
+            <author>
+                <lastname>Daniel</lastname>
+                <firstname>Beasley</firstname>
+            </author>
+        </authors>
+        <version>1</version>
+        <input-parameters>
+            
+            <parameter>
+                <name>subject_id</name>
+                <values>
+                    <schemalink>xnat:imageSessionData/subject_ID</schemalink>
+                </values>
+                <description>The experiments subject id</description>
+            </parameter>
+            
+            <parameter>
+                <name>session_label</name>
+                <values>
+                    <schemalink>xnat:experimentData.label</schemalink>
+                </values>
+                <description>The experiments label</description>
+            </parameter>
+
+            <parameter>
+                <name>xnat_project</name>
+                <values>
+                    <schemalink>xnat:experimentData.project</schemalink>
+                </values>
+                <description>The experiments project id</description>
+            </parameter>
+
+            <parameter>
+                <name>clinical_trial_name</name>
+                <values>
+                    <csv>clinical_trial_name</csv>
+                </values>
+                <description>Set the clinical trial id</description>
+            </parameter>
+           
+
+            <parameter>
+                <name>ct_subject</name>
+                <values>
+                    <csv>clinicaltrial_subject_id</csv>
+                </values>
+                <description>Set the value to 1 if you want the pipeline to notify the user when complete. 0 otherwise</description>
+            </parameter>
+           
+
+            <parameter>
+	           <name>ct_session</name>
+                <values>
+                    <csv>clinicaltrial_session_id</csv>
+                </values>
+                <description>Set the value to 1 if you want the pipeline to notify the user when complete. 0 otherwise</description>
+            </parameter>
+            
+            
+           
+            <parameter>                
+                <name>new_labels</name>
+                <values>
+                    <csv>roi_labels</csv>
+                </values>
+                <description>csv of new roi labels to replace existing if false</description>
+             </parameter>
+
+              <parameter>                
+                <name>anon_project</name>
+                <values>
+                    <csv>annoymised_project</csv>
+                </values>
+                <description>The anonymised project to send the data to</description>
+             </parameter>
+
+                           <parameter>                
+                <name>benchmark</name>
+                <values>
+                    <csv>0</csv>
+                </values>
+                <description>Whetehr it is benchmark data</description>
+             </parameter>
+
+
+        </input-parameters>
+    </documentation>
+
+
+    <outputFileNamePrefix>^concat("/data/xnat/cache/temp/",/Pipeline/parameters/parameter[name='session_label']/values/unique/text(),'/',/Pipeline/name/text())^</outputFileNamePrefix>
+    <parameters>
+    </parameters>
+
+    <steps>
+      <step description="Replace RT Struct labels" id="1" >
+            <resource location="/data/xnat/scripts/pipelines/resources" name="replace_rtstruct_labels">
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='xnat_project']/values/unique/text()^</value>
+                </argument>
+                 <argument id="subjectid">
+                    <value>^/Pipeline/parameters/parameter[name='subject_id']/values/unique/text()^</value>
+                </argument>
+                <argument id="session">
+                    <value>^/Pipeline/parameters/parameter[name='session_label']/values/unique/text()^</value>
+                </argument>
+                 <argument id="newlabels">
+                    <value>^/Pipeline/parameters/parameter[name='new_labels']/values/unique/text()^</value>
+                </argument>
+                <argument id="user">
+                  <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                </argument>
+                <argument id="pwd">
+                    <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                </argument>
+
+            </resource>
+        </step>
+          <step description="Trigger Export Anon Script" id="2" >
+            <resource location="/data/xnat/scripts/pipelines/resources" name="export_anon">
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='xnat_project']/values/unique/text()^</value>
+                </argument>
+                <argument id="ct_id">
+                    <value>^/Pipeline/parameters/parameter[name='clinical_trial_name']/values/unique/text()^</value>
+                </argument>
+                <argument id="ctsubject">
+                    <value>^/Pipeline/parameters/parameter[name='ct_subject']/values/unique/text()^</value>
+                </argument>
+                <argument id="ctsession">
+                 <value>^/Pipeline/parameters/parameter[name='ct_session']/values/unique/text()^</value>
+                </argument>
+                 <argument id="subjectid">
+                    <value>^/Pipeline/parameters/parameter[name='subject_id']/values/unique/text()^</value>
+                </argument>
+                <argument id="session">
+                    <value>^/Pipeline/parameters/parameter[name='session_label']/values/unique/text()^</value>
+                </argument>
+                
+                <argument id="anonymisedproject">
+                    <value>^/Pipeline/parameters/parameter[name='anon_project']/values/unique/text()^</value>
+                </argument>
+                <argument id="benchmark">
+                    <value>^/Pipeline/parameters/parameter[name='benchmark']/values/unique/text()^</value>
+                </argument>
+                <argument id="user">
+                  <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                </argument>
+                <argument id="pwd">
+                    <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                </argument>
+
+            </resource>
+        </step>
+
+    </steps>
+</Pipeline>

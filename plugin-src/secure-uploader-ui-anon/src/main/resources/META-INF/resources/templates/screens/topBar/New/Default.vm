@@ -1,0 +1,17 @@
+#* @vtlvariable name="projectString" type="java.lang.String" *#
+#* @vtlvariable name="siteConfig" type="org.nrg.xdat.preferences.SiteConfigPreferences" *#
+#* @vtlvariable name="data" type="org.apache.turbine.util.RunData" *#
+#* @vtlvariable name="link" type="org.apache.turbine.services.pull.tools.TemplateLink" *#
+#* @vtlvariable name="displayManager" type="org.nrg.xdat.display.DisplayManager" *#
+#* @vtlvariable name="project" type="org.nrg.xdat.om.XnatProjectdata" *#
+#* @vtlvariable name="turbineUtils" type="org.nrg.xdat.turbine.utils.TurbineUtils" *#
+#* @vtlvariable name="user" type="org.nrg.xdat.security.XDATUser" *#
+#* @vtlvariable name="userHelper" type="org.nrg.xdat.security.services.UserHelperServiceI" *#
+
+<!-- Sequence: 10 -->
+#set($userHelper = $userHelper)
+#if ($turbineUtils.isSiteAdmin($user) || $siteConfig.uiAllowNonAdminProjectCreation || $userHelper.canCreate("xnat:subjectData/project"))
+    <li><a href="$link.setPage("XDATScreen_add_xnat_projectData.vm")">$displayManager.getSingularDisplayNameForProject()</a></li>
+#end
+
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pip:Resource xmlns:pip="http://nrg.wustl.edu/pipeline">
+	<pip:name>replace_rtstruct_labels.sh</pip:name>
+	<pip:location>/opt/scripts</pip:location>
+	<pip:type>Executable</pip:type>
+	<pip:description>
+		Anonymises then uses REST to export data for secure XNAT uploader
+	</pip:description>
+	<pip:input>
+		<pip:argument id="project">			
+			<pip:description>XNAT Project ID to which the Session belongs</pip:description>
+		</pip:argument>
+
+		<pip:argument id="subjectid">			
+			<pip:description>Project Subject ID</pip:description>
+		</pip:argument>
+
+		<pip:argument id="session">			
+			<pip:description>Project Session Label</pip:description>
+		</pip:argument>
+
+
+		<pip:argument id="newlabels">			
+			<pip:description>New ROI labels</pip:description>
+		</pip:argument>
+
+		<pip:argument id="user">			
+			<pip:description>XNAT Username</pip:description>
+		</pip:argument>
+
+		<pip:argument id="pwd" isSensitive="true">			
+			<pip:description>XNAT Password</pip:description>
+		</pip:argument>
+
+	</pip:input>
+</pip:Resource>

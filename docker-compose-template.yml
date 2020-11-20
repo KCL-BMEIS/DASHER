@@ -1,0 +1,120 @@
+version: '3.7'
+services:
+    xnat-web1:
+       image: xnat1:latest
+       deploy:
+          replicas: 1
+          restart_policy:
+            condition: on-failure
+          placement:
+            constraints: [node.role == manager]
+          resources:
+            limits:
+              cpus: '2.5'
+              memory: 3500M
+       ports:
+        - "8104:8104"
+        - "8080:8080"
+       depends_on:
+         - xnat-db1
+       volumes:
+         # too slow 
+         - "./volume/tomcat_logs1:/data/xnat/home/logs"
+         - "./volume/archive1:/data/xnat/archive"
+         - "./volume/scripts1:/data/xnat/scripts"
+         - "/var/run/docker.sock:/var/run/docker.sock"
+         - "@IMPORT_DATA_FOLDER@:/data/xnat/import_data"
+         #WINX- ./volume/postgres-data1:/pg_backup  
+#       networks:    
+#         - backend
+    xnat-db1:
+       image: postgres-xnat:latest
+       deploy:
+          replicas: 1
+          restart_policy:
+            condition: on-failure     
+          placement:
+            constraints: [node.role == manager]
+          resources:
+            limits:
+              cpus: '1'
+              memory: 1000M 
+       environment:
+         POSTGRES_USER: @PG_USER@
+         POSTGRES_PASSWORD: @PG_PWD@
+         POSTGRES_DB: xnat
+       command: postgres -c config_file=/etc/postgresql.conf
+       volumes:
+        - ./postgres/postgresql.conf:/etc/postgresql.conf
+        #LINUX - use original....
+        #LINX- ./volume/postgres-data1:/var/lib/postgresql/data
+    xnat-web2:
+       image: xnat2:latest
+       deploy:
+          replicas: 1   
+          restart_policy:
+            condition: on-failure
+          placement:
+            constraints: [node.role == manager]      
+          resources:
+            limits:
+              cpus: '0.9'
+              memory: 2000M
+       depends_on:
+         - xnat-db2
+       volumes:
+         # too slow 
+         - "./volume/tomcat_logs2:/data/xnat/home/logs"
+         - "./volume/archive2:/data/xnat/archive"
+         - "./volume/scripts2:/data/xnat/scripts"
+         - "/var/run/docker.sock:/var/run/docker.sock"
+         #WINX- ./volume/postgres-data2:/pg_backup  
+#       networks:    
+#         - backend
+    xnat-db2:
+       image: postgres-xnat:latest
+       deploy:
+          replicas: 1
+          restart_policy:
+            condition: on-failure     
+          placement:
+            constraints: [node.role == manager]
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 900M
+       environment:
+         POSTGRES_USER: @PG_USER@
+         POSTGRES_PASSWORD: @PG_PWD@
+         POSTGRES_DB: xnat
+       command: postgres -c config_file=/etc/postgresql.conf
+       volumes:
+        # default :consistent, so postgres identical on host and container
+        - ./postgres/postgresql.conf:/etc/postgresql.conf
+        #LINUX - use original....
+        #LINX- ./volume/postgres-data2:/var/lib/postgresql/data
+
+    xnat-nginx1:
+       image: nginx-xnat1:latest
+       deploy:
+          replicas: 1
+          resources:
+            limits:
+              cpus: "0.1"
+              memory: 100M
+          restart_policy:
+            condition: on-failure
+       volumes:
+        - "./volume/certificates:/etc/ssl"
+        - "./volume/nginx_logs:/var/log/nginx"
+       ports:
+        - "80:80"
+        - "8082:8082"
+        - "443:443"
+        - "444:444"
+       depends_on:
+        - xnat-web1
+        - xnat-web2
+
+
+

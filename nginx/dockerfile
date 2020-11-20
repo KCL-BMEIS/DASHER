@@ -1,0 +1,11 @@
+FROM nginx:1.17-alpine
+RUN rm -v /etc/nginx/nginx.conf
+RUN rm /etc/nginx/conf.d/*
+COPY nginx.conf /etc/nginx/
+COPY xnat.conf /etc/nginx/conf.d/
+RUN chmod -R 775 /etc/nginx/
+
+EXPOSE 444
+EXPOSE 443
+EXPOSE 80
+EXPOSE 8082

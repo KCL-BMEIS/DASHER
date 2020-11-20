@@ -1,0 +1,54 @@
+##<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+$data.setLayoutTemplate("Popup.vm")
+$page.setTitle("Laucnh Pipeline")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+#if ($data.message)
+<div class="alert">$data.message</div>
+#end
+<p>
+<form ID="form1" name="form1" method="post" action="$link.setAction("ManagePipeline")">
+#if($vr)
+	<div class="error">Invalid parameters:<BR>$vr.toHTML()</div>
+<HR>
+#end
+
+
+#set ($disabled = "checked")
+
+
+#if ($isQueuedOrRunning)
+#set ($disabled = "disabled")
+<font color="red"> Another Process is currently running on thsi session. Please try again later. </font> 
+#end
+
+<TABLE>
+<TR>
+<TD><b>Please select a pipeline to launch for  $item.getProperty("label") </b></TD>
+</TR>
+<TR>
+<TD><input type="radio" name="pipeline" value="/data/xnat/scripts/pipelines/delete_subject.xml" $disabled> Procees with Delete Subject... </TD>
+</TR>
+<TR>
+</TR>
+
+
+
+
+<TR>
+#if ($isQueuedOrRunning)
+<TD align="center"><input type="button" ONCLICK="javascript:window.close()" value="Close"/></TD>
+#else
+<TD align="center"><input type="button" ONCLICK="javascript:window.close()" value="Close"/>&nbsp;&nbsp;&nbsp;<input type="submit"  name="eventSubmit_doRedirect" value="Submit"/></TD>
+#end
+</TR>
+</TABLE>
+
+<input type="hidden" name="schema_type" value="$item.getXSIType()">
+
+#xdatPassItemFormFields($search_element $search_field $search_value $project) 
+
+
+</form>
+

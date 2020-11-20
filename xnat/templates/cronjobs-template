@@ -1,0 +1,4 @@
+00 01 * * * /data/xnat/scripts/clean_logs.sh > /data/xnat/scripts/logs/clean_logs.log
+*/5 * * * * /data/xnat/upload-resources.sh > /data/xnat/scripts/logs/upload-resources.log
+#WIN#00,30 * * * * /opt/scripts/pg_backup.sh
+

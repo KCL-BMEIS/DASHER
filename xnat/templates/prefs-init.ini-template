@@ -1,0 +1,26 @@
+[siteConfig]
+
+siteId=@SITE@
+siteUrl=@SITEURL@
+adminEmail=@ADMIN_EMAIL@
+
+archivePath=/data/xnat/archive
+prearchivePath=/data/xnat/prearchive
+cachePath=/data/xnat/cache
+buildPath=/data/xnat/build
+ftpPath=/data/xnat/ftp
+pipelinePath=/data/xnat/pipeline
+
+requireLogin=true
+userRegistration=false
+enableCsrfToken=true
+sessionTimeout=1 hour
+initialized=false
+
+[notifications]
+
+smtpEnabled=true
+smtpHostname=localhost
+smtpPort=25
+smtpProtocol=smtp
+emailPrefix=@SITE@

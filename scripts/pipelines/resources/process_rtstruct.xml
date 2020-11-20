@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pip:Resource xmlns:pip="http://nrg.wustl.edu/pipeline">
+	<pip:name>process-rtstruct.sh</pip:name>
+	<pip:location>/opt/scripts</pip:location>
+	<!-- <pip:commandPrefix>@PIPELINE_DIR_PATH@/image-tools/vnc_launch</pip:commandPrefix> -->
+	<pip:type>Executable</pip:type>
+	<pip:description>
+		Converts rtstruct scans to assessors and extracts roi label
+	</pip:description>
+	<pip:input>
+
+		<pip:argument id="session_id">
+			
+			<pip:description>XNAT session id</pip:description>
+		</pip:argument>
+		
+		<pip:argument id="session_label">
+			
+			<pip:description>XNAT session label</pip:description>
+		</pip:argument>
+
+		<pip:argument id="project">
+			
+			<pip:description>Project Label</pip:description>
+		</pip:argument>
+	</pip:input>
+</pip:Resource>

@@ -1,0 +1,191 @@
+#parse($turbineUtils.getTemplateName("report","xnat:imageAssessorData",$project))
+
+<script type="text/javascript">
+	document.title = "Assessment for $!mr.getIdentifier($project,false)";
+   
+</script>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+$page.setTitle("Add Clinical Trial")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+#if ($turbineUtils.GetPassedParameter("popup", $data))
+	#set ($popup = $turbineUtils.GetPassedParameter("popup", data) )
+	#set ($popup = "false")
+#end
+
+
+#parse("macros/tigMacros.vm")
+
+#macro(cmicShowRadioYesNo $property)
+  	#set ($value = "")    
+    #set($value = $!item.getProperty($property))
+    #if("" == $value) 
+        (No value selected)   
+    #elseif ("$value" == "1")
+        Yes
+    #else
+        No
+    #end
+#end
+
+#macro(showScalarProperty $property $item $items)
+    #set($value = $!item.getProperty($property))
+    #if ($value && 0 <= $value && $items.size() >= $value)
+        $items.get($value)
+    #else
+        (No value provided)
+    #end
+#end
+
+<script type="text/javascript">
+    window.currentID="$!om.getId()";
+        #if($om.getProject())
+            #if($om.getProject().equals(""))
+            window.currentProject="$!project";
+            #else
+            window.currentProject="$!om.getProject()";
+            #end
+        #else
+        window.currentProject="$!project";
+        #end
+   
+    window.currentSubject="$!subjectId";
+    window.currentLabel="$!om.getLabel()";
+    
+
+</script>
+
+
+<TABLE width="100%">
+	<TR>
+		<TD>
+			<table width="100%">
+				<tr>
+					<td align="left" valign="middle">
+						<DIV class="edit_title">Pseudonymised Session</DIV>
+					</td>
+				</tr>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<TABLE width="100%">
+				<TR>
+					<TD valign="top">
+
+
+       #set($form = "session")
+       <table >
+           <tr>
+               <td></td>
+           </tr>
+           <tr>
+               #formLabel("Session:")
+               #set($session=$om.getImageSessionData())
+               #set($session_id=$item.getProperty("imageSession_ID"))
+               #if ($session)
+                   #set ($click = "return popup('$link.setAction('DisplayItemAction').addPathInfo('search_element','xnat:imageSessionData').addPathInfo('search_field','xnat:imageSessionData.ID').addPathInfo('search_value',$session_id).addPathInfo('popup',true).addPathInfo('project',$project)', '','600','800');")
+                   <td><a class=b href="#" onClick="$click">$!session.getIdentifier($project)</A></TD>
+               #else
+                   <td>$!item.getProperty("imageSession_ID")</td>
+               #end
+	    
+	    
+           </tr>
+           <tr>
+               #formLabel("Visit Date:")
+               <td>$!session.getDate()</td>
+           </tr>
+           <tr>
+               #formLabel("Subject:")
+               <td>$!session.getSubjectData().getIdentifier($project,false)</td>
+           </tr>
+           		#formLabel("Project:")<TD>$!item.getStringProperty("clinicalTrials:clinicaltrial/project")</TD></TR> 
+            </table>	<TABLE><tr> <th colspan="2"><hr/></th></tr> 
+           <tr>#formLabel("Label")<TD>$!item.getStringProperty("clinicalTrials:clinicaltrial/label")</TD></TR> 
+                    
+                    <tr> <td colspan="2">&nbsp;</td></tr>
+                
+
+                <tr>
+<td valign="top" class="formLabel">Clinical Trial Name</td>
+<td valign="top" id="ct_id">
+$!item.getStringProperty("clinicalTrials:clinicaltrial/ct_id")
+</td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Clinical Trial/Research Subject ID</td>
+<td valign="top">
+$!item.getStringProperty("clinicalTrials:clinicaltrial/ct_subject_id")
+</td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Clinical Trial/Research Session ID</td>
+<td valign="top">
+$!item.getStringProperty("clinicalTrials:clinicaltrial/ct_session_id")
+</td>
+</tr>
+
+<tr>
+<td colspan="2">&nbsp;</td>
+</tr>
+<tr>
+
+<td id=demo valign="top" style="font-size: 16px; margin-top: 20px">
+#set($aurl=$!item.getStringProperty("clinicalTrials:clinicaltrial/anon_url"))
+#set($proj=$!item.getStringProperty("clinicalTrials:clinicaltrial/project"))
+#set($subid=$!item.getStringProperty("clinicalTrials:clinicaltrial/ct_subject_id"))
+#set($xsi=$session.getXSIType())
+
+<script type="text/javascript">
+var suburl = "${aurl}";
+var p = "${proj}";
+var xsi = "${xsi}";
+var txt = "View Pseudonymised Session"
+var protocol = location.protocol;
+var slashes = protocol.concat("//");
+var host = slashes.concat(window.location.hostname);
+
+var port = "8082"
+if( host.includes("https")) {
+    port = "444"
+}
+
+// .includes DOES NOT WORK ON IE
+// use string.indexOf(substring) !== -1
+
+if ( document.getElementById("ct_id").innerHTML.includes("_RESEARCH_") ) {
+     document.getElementById("demo").innerHTML = "<a  href=" + host + ":" + port + "/anon/app/action/DisplayItemAction/search_value/" + suburl + " target=\"_blank\"/>View Pseudonymised Session</a>";
+} else {
+     document.getElementById("demo").innerHTML = "<a  href=" + host + ":" + port + "/anon/app/action/DisplayItemAction/search_value/" + suburl + " target=\"_blank\"/>View Pseudonymised Session </a>";
+}
+
+</script>
+
+
+
+
+
+
+</td>
+<td></td>
+</tr>
+             <tr>
+             <td colspan="2">&nbsp;</td>
+            </tr>
+
+							
+						</TABLE>
+					</TD>
+					<TD valign="top" align="right">
+						#parse($turbineUtils.getTemplateName("actions",$om.getXSIType(),$project))
+					</TD>
+				</TR>
+			</TABLE>
+		</TD>
+	</TR>
+</TR>
+</TABLE>

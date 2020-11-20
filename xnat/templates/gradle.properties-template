@@ -1,0 +1,6 @@
+adminEmail=@ADMIN_EMAIL@
+destination=/data/xnat/pipeline
+modulePaths=/data/xnat/scripts/pipelines
+siteName=@SITE@
+xnatUrl=@PIPELINE_URL@
+smtpServer=localhost

@@ -1,0 +1,182 @@
+<script type="text/javascript" LANGUAGE="javascript" src="$content.getURI('scripts/subjectAssessorData/proj_tools.js')"></SCRIPT>
+$page.setTitle("XDAT")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+
+#set ($imageSessionType = $om.getImageSessionData().getXSIType())
+
+#set($months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
+#set($days = [ 1..31 ])
+#set($years = [ $!turbineUtils.getYear()..1900])
+
+#if ($data.message)
+	<div class="alert">$data.message</div>
+#end
+
+#parse("macros/tigMacros.vm")
+
+<script type="text/javascript">
+    window.currentID="$!om.getId()";
+        #if($om.getProject())
+            #if($om.getProject().equals(""))
+            window.currentProject="$!project";
+            #else
+            window.currentProject="$!om.getProject()";
+            #end
+        #else
+        window.currentProject="$!project";
+        #end
+
+    window.currentSubject="$!subjectId";
+    window.currentLabel="$!om.getLabel()";
+</script>
+
+<script type="text/javascript">
+
+    function addCssClassToElement(element, cssClass) {
+        element.className += " " + cssClass;
+    }
+
+    function removeCssClassFromElement(element, cssClass) {
+        var reg = new RegExp('(\\s|^)' + cssClass + '(\\s|$)');
+        element.className = element.className.replace(reg, ' ');
+    }
+
+    function togglePanel(panelId, display) {
+        var panel = document.getElementById(panelId);
+        if (display) {
+            removeCssClassFromElement(panel, 'unhidden');
+            removeCssClassFromElement(panel, 'hidden');
+            addCssClassToElement(panel, 'unhidden');
+        } else {
+            removeCssClassFromElement(panel, 'unhidden');
+            removeCssClassFromElement(panel, 'hidden');
+            addCssClassToElement(panel, 'hidden');
+        }
+    }
+
+    
+</script>
+
+
+<p>
+<form ID="form1" name="form1" method="post" action="$link.setAction("ModifyItem")">
+<input type="hidden" name="project" value="$!{project}" >
+
+#if($vr)
+	<div class="error">Invalid parameters:<BR>$vr.toHTML()</div>
+    <HR>
+#end
+
+<table width="100%">
+	<tr>
+		<td>
+			<table width="100%">
+				<tr>
+					<td align="left" valign="middle">
+						<DIV class="edit_title">Clinical Trial</DIV>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table width="100%">
+				<tr>
+					<td valign="top">
+						       #set($form = "session")
+                               #set($mr=$om.getImageSessionData())
+      <table width="100%">
+
+					
+			  <input type="hidden" name="clinicalTrials:clinicaltrial/ID" value="$item.getProperty("ID")"/>
+			  <input type="hidden" name="clinicalTrials:clinicaltrial/label" value="$item.getProperty("label")"/>
+			  <input type="hidden" name="clinicalTrials:clinicaltrial/project" value="$item.getProperty("project")"/>
+			</TABLE>
+			
+			#xdatHiddenBox("clinicalTrials:clinicaltrial/imageSession_ID" $item "")
+
+			<P><TABLE align="left" width="100%">
+				<TR>
+			<TD>
+				
+				<TABLE align="left">
+					<TR><TH align="left">Session: </TH>
+					#set($mr_id=$item.getProperty("imageSession_ID"))
+               #set($xsi_type=$mr.getXSIType())
+               #set($xsi_type_idstr="${xsi_type}.ID")
+				#if ($mr)
+					#set ( $click = "return popup('$link.setAction('DisplayItemAction').addPathInfo('search_element',$xsi_type).addPathInfo('search_field',$xsi_type_idstr).addPathInfo('search_value',$mr_id).addPathInfo('popup',true).addPathInfo('project',$project)', '','600','800');" )
+				  <TD><A CLASS=b href="#" onClick="$click">$!mr.getIdentifier($project)</A></TD>
+					#else
+						<TD>$!item.getProperty("imageSession_ID")</TD>
+					#end
+					</TR>
+					<TR><TH align="left" width=200>Visit Date: </TH><TD>$!mr.getDate()</TD></TR>
+					<TR><TH align="left">Subject: </TH><TD>$!mr.getSubjectData().getIdentifier($project,false)</TD></TR>
+
+				</TABLE>
+
+					</TD>
+				</TR>
+                
+			</TABLE>
+                       <tr> <th colspan="2"><hr/></th></tr>      
+                        
+                        <table>               
+                            <tr>
+<td valign="top" class="formLabel">Clinical Trial  ID</td>
+  <td>
+#xdatTextBox("clinicalTrials:clinicaltrial/ct_id" $item "" $vr)
+  </td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Clinical Trial Subject ID</td>
+  <td>
+#xdatTextBox("clinicalTrials:clinicaltrial/ct_subject_id" $item "" $vr)
+  </td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Clinical Trial Session ID</td>
+  <td>
+#xdatTextBox("clinicalTrials:clinicaltrial/ct_session_id" $item "" $vr)
+  </td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Anonymised URL</td>
+  <td>
+#xdatTextBox("clinicalTrials:clinicaltrial/anon_url" $item "" $vr)
+  </td>
+</tr>
+<tr>
+<td valign="top" class="formLabel">Nomenclature corrcet</td>
+  <td>
+#xdatTextBox("clinicalTrials:clinicaltrial/labels_correct" $item "" $vr)
+  </td>
+</tr> 
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+		#xdatEditProps($item $edit_screen)
+		<input type="submit" name="eventSubmit_doInsert" value="Submit"/>
+		</td>
+	</tr>
+</table>
+</form>
+
+<script type="text/javascript">
+function validateForm()
+{
+   //INSERT CUSTOM CONTENT HERE
+
+   validateExperimentForm();
+   return false;
+}
+</script>

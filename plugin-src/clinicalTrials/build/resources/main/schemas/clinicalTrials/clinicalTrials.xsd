@@ -1,0 +1,85 @@
+<xs:schema targetNamespace="http://localhost/clinicalTrials"
+xmlns:clinicalTrials="http://localhost/clinicalTrials"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+elementFormDefault="qualified"
+attributeFormDefault="unqualified"
+xmlns:xdat="http://nrg.wustl.edu/xdat"
+xmlns:xnat="http://nrg.wustl.edu/xnat">
+<xs:import namespace="http://nrg.wustl.edu/xnat" schemaLocation="../xnat/xnat.xsd"/>
+ 
+ 
+
+ 
+  <xs:element name="clinicaltrialAssessment" type="clinicalTrials:clinicaltrial"/>
+    <xs:element name="clinicaltrialSubjectAssessment" type="clinicalTrials:clinicaltrialsubject"/>
+ 
+ 
+ 
+<xs:complexType name="clinicaltrial">
+    <xs:annotation>
+        <xs:documentation>Clinical Trial</xs:documentation>
+     </xs:annotation>
+<xs:complexContent>
+<xs:extension base="xnat:imageAssessorData">
+<xs:sequence>
+      <xs:element name="ct_id" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Clinical Trial  Name</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ct_subject_id" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Clinical Trial Subject ID</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ct_session_id" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Clinical Trial Session ID</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="anon_url" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Anonymised URL</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="name" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Anonymised URL</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="labels_correct" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Nomenclature corrcet</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+ 
+ 
+ 
+<xs:complexType name="clinicaltrialsubject">
+    <xs:annotation>
+        <xs:documentation>Clinical Trial Subject List</xs:documentation>
+     </xs:annotation>
+<xs:complexContent>
+<xs:extension base="xnat:subjectAssessorData">
+<xs:sequence>
+      <xs:element name="research_subject_id" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Research Subject ID</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ct_subject_id" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>subject CLinical Trial Subject ID</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+ </xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+
+</xs:schema>

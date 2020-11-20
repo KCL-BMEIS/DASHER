@@ -1,0 +1,202 @@
+/*
+ * build.gradle
+ * XNAT http://www.xnat.org
+ * Copyright (c) 2018, Washington University School of Medicine
+ * All Rights Reserved
+ *
+ * Released under the Simplified BSD.
+ */
+
+buildscript {
+    ext {
+        vXnat = "1.7.4"
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            url "http://maven.imagej.net/content/groups/public"
+            name "ImageJ Maven Repository"
+        }
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "https://www.dcm4che.org/maven2/"
+            name "dcm4che Maven Repository"
+        }
+        maven {
+            url "https://nrgxnat.jfrog.io/nrgxnat/libs-release"
+            name "XNAT Release Repository"
+        }
+        maven {
+            url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot"
+            name "XNAT Snapshot Repository"
+        }
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.6.RELEASE"
+        classpath "org.nrg.xnat.build:xnat-data-builder:${vXnat}"
+    }
+}
+
+group "org.nrg.xnat.plugin"
+version "1.0.3"
+
+apply plugin: "io.spring.dependency-management"
+apply plugin: "groovy"
+apply plugin: "java"
+apply plugin: "jacoco"
+apply plugin: "maven"
+apply plugin: "maven-publish"
+apply plugin: "idea"
+apply plugin: "eclipse"
+apply plugin: "xnat-data-builder"
+
+repositories {
+    mavenLocal()
+    maven {
+        url "http://maven.imagej.net/content/groups/public"
+        name "ImageJ Maven Repository"
+    }
+    maven {
+        url "https://www.dcm4che.org/maven2/"
+        name "dcm4che Maven Repository"
+    }
+    jcenter()
+    mavenCentral()
+    maven {
+        url "https://nrgxnat.jfrog.io/nrgxnat/libs-release"
+        name "XNAT Release Repository"
+    }
+    maven {
+        url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot"
+        name "XNAT Snapshot Repository"
+    }
+    maven {
+        url "https://nrgxnat.jfrog.io/nrgxnat/ext-release"
+        name "XNAT External Release Repository"
+    }
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+if (hasProperty("rt.17.jar")) {
+    // Solution for bootstrap classpath warning and possible issues with compatibility with 1.7 libraries
+    // was taken from this post on discuss.gradle.org: http://bit.ly/24xD9j0
+    def rt17jar = getProperty("rt.17.jar")
+    logger.info "Using ${rt17jar} as the bootstrap class path jar."
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-XDignore.symbol.file"
+            options.bootstrapClasspath = files(rt17jar)
+        }
+    }
+} else {
+    logger.warn "No value was set for the rt.17.jar build property, using the default bootstrap class path. You should consider setting rt.17.jar to indicate a jar file containing the Java 1.7 run-time library:\n"
+    logger.warn "  ./gradlew -Prt.17.jar=rt-1.7.0_45.jar war\n"
+}
+
+configurations {
+    compile.extendsFrom(compileAndInclude)
+    all {
+        exclude group: "com.sun.media", module: "jai_imageio"
+    }
+}
+
+dependencyManagement.imports {
+    mavenBom "org.nrg:parent:${vXnat}"
+}
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file(compileJava.destinationDir)
+        testOutputDir = file(compileTestJava.destinationDir)
+    }
+}
+
+jacoco {
+    toolVersion = dependencyManagement.importedProperties["jacoco.version"] as String
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled = false
+        csv.enabled = false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+            srcDir "build/xnat-generated/src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+            srcDir "build/xnat-generated/src/main/resources"
+        }
+    }
+}
+
+
+dependencies {
+    compile "org.nrg.xnat:web"
+    compile "org.nrg.xnat:xnat-data-models"
+    compile "org.nrg.xdat:core"
+    compile "org.nrg:framework"
+    compile "org.nrg:config"
+    compile "org.nrg:dicom-xnat-util"
+    compile "org.springframework:spring-context"
+    compile "dcm4che:dcm4che-core"
+    compile "com.google.guava:guava"
+
+    testCompile "junit:junit"
+    testCompile "org.springframework:spring-test"
+}
+
+def buildDate = new Date()
+def buildNumber = System.getenv().BUILD_NUMBER?.toInteger() ?: "Manual"
+
+logger.info "Build-Date:   ${buildDate}"
+logger.info "Build-Number: ${buildNumber}"
+
+jar {
+    baseName "uploader-auto-dicom"
+    manifest {
+        attributes "Application-Name": "Uploader automatic Dicom routing",
+                "Build-Date": buildDate,
+                "Build-Number": buildNumber
+    }
+}
+
+publishing.publications {
+    mavenJava(MavenPublication) {
+        from components.java
+    }
+}
+
+publishing.repositories {
+    maven {
+        credentials {
+            // These properties must be set in the ~/.gradle/gradle.properties file or passed on the Gradle command
+            // line in the form -PrepoUsername=foo -PrepoPassword=bar.
+            username propertyWithDefault("repoUsername", "username")
+            password propertyWithDefault("repoPassword", "password")
+        }
+        if (project.version.endsWith("-SNAPSHOT")) {
+            url "https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot-local"
+        } else {
+            url "https://nrgxnat.jfrog.io/nrgxnat/libs-release-local"
+        }
+    }
+}
+
+def propertyWithDefault(String property, Object value) {
+    hasProperty(property) ? getProperty(property) : value
+}

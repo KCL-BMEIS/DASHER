@@ -1,0 +1,470 @@
+
+
+
+<TABLE>
+        <TR><TD>Please Select a Project to send pseudonymised data to. </TD></>
+   
+    </TABLE>
+<TABLE>
+                               <TR style="$style">
+                                  <TD style="font-weight:bold"><input type="hidden"  id="param[7].name" name="param[7].name" value="anon_project"/><font size="-1" >Select Pseudonymised Project:</font></TD>
+                                  <TD> <select id="selectProject" onchange="readProjects()" >
+                                    <option style="font-weight:bold">Select Pseudonymised Project</option> 
+                                  </select></TD>       
+                              </tr>
+
+ </TABLE>
+
+<div id="autoormanual" class="hidden">
+
+<TABLE>
+        <TR><TD>Please Select to automatically generate Session and Subject IDs for research or manually input labels for clinical trials or manual labels for research</TD></>
+   
+    </TABLE>
+  <TABLE>
+          <input type="radio" name="select_auto" value="0"  checked onclick="togglePanel('auto', true);togglePanel('manual', false);setGenerate();"/>&nbsp;Automatic
+
+   </TABLE>
+
+
+   <TABLE>
+      <input type="radio" name="select_auto" value="1" onclick="togglePanel('auto', false);togglePanel('manual', true);"/>&nbsp;Manual
+   </TABLE>
+
+
+
+
+
+
+<TABLE id="auto" class="hidden">
+
+
+
+
+   <TR><TD>IDs will be generated using hashing and sent to the Research Pseudonymised Project. Click on Pseudonymise Session</TD></TR>
+ </TABLE>
+
+
+ <TABLE>
+    <input type="checkbox" id="select_benchmark" name="select_benchmark" onclick="setBenchmark();"/>&nbsp;Is this Benchmark Data?
+ </TABLE>
+
+<div id="manual" class="hidden" >
+        <TABLE>
+            <TR><TD>Please ensure the session conforms to the clinical trial protocol. </TD></>
+            <TR><TD>Select the clinical trial from the dropdown list, check RT STructure labels and click on Validate. </TD></>
+       
+        </TABLE>
+
+
+
+
+        <TABLE>
+
+
+                    #set ($c = 0)
+                    #foreach ($param in $parameters.getParameterArray())   
+                        #if("3"=="$c")
+                                  <TR style="$style">
+                                  <TD style="font-weight:bold"><input type="hidden"  id=${dblQts}param[3].name${dblQts} name=${dblQts}param[3].name${dblQts} value="clinical_trial_name"/><font size="-1" >Clinical Trial Name:</font></TD>
+                                  <TD> <select id="selectClinicalTrial" onchange="readPermittedLabels()">
+                                    <option style="font-weight:bold">Select clinical trial</option>
+                                    <option>No Trial</option>
+                                  </select></TD>       
+                              </tr>
+                              <TR><TD colspan="2"><span id="messages3" style="font-weight:bold"></span></TD></>
+                              <TR style="display:none">
+                               <TD></TD>
+                                 <TD><input type="text" id=${dblQts}param[3][0].value${dblQts}  name=${dblQts}param[3][0].value${dblQts} value="clinical_trial_name"/></TD>
+                                 <input type="hidden"  id=${dblQts}param[3].name.rowcount${dblQts} name=${dblQts}param[3].name.rowcount${dblQts} value="1"/>
+                              </tr>
+
+                        #elseif("4"=="$c")
+                            <TR style="">
+                              <TD style="font-weight:bold"><input type="hidden"  id=${dblQts}param[4].name${dblQts} name=${dblQts}param[4].name${dblQts} value="ct_subject"/><font size="-1" >Clinical Trial Subject ID:</font></TD> 
+                                   <TD><input type="text" id=${dblQts}param[4][0].value${dblQts}  name=${dblQts}param[4][0].value${dblQts}  onchange="checkIDs()" value="clinicaltrial_subject_id"/></TD>
+                                   <TD>NO SPACES IN IDs!</TD>
+                                 <input type="hidden"  id=${dblQts}param[4].name.rowcount${dblQts} name=${dblQts}param[4].name.rowcount${dblQts} value="1"/>
+                                </tr>
+                        #elseif("5"=="$c")
+
+                              <TR style="">
+                                <TD style="font-weight:bold"><input type="hidden"  id=${dblQts}param[5].name${dblQts} name=${dblQts}param[5].name${dblQts} value="ct_session"/><font size="-1">Clinical Trial Session ID:</font></TD> 
+                                     <TD><input type="text" id=${dblQts}param[5][0].value${dblQts}  name=${dblQts}param[5][0].value${dblQts} onchange="checkIDs()"  value="clinicaltrial_session_id"/></TD>
+                                     <TD>NO SPACES IN IDs!</TD>
+                                   <input type="hidden"  id=${dblQts}param[5].name.rowcount${dblQts} name=${dblQts}param[5].name.rowcount${dblQts} value="1"/>
+                                  </tr>
+
+                        #elseif("7"=="$c")
+
+                               <TR style="display:none"  onchange="readProjects()">
+                               <TD></TD>
+                                 <TD><input type="text" id=${dblQts}param[7][0].value${dblQts}  name=${dblQts}param[7][0].value${dblQts} value="anonymised_project_value"/></TD>
+                                 <input type="hidden"  id=${dblQts}param[7].name.rowcount${dblQts} name=${dblQts}param[7].name.rowcount${dblQts} value="1"/>
+                              </tr>
+
+
+
+
+                        #else
+                                <TR style="display:none">
+                                     <TD><input type="hidden"  id=${dblQts}param[$c].name$dblQts name=${dblQts}param[$c].name$dblQts value="$param.getName()"/><font size="-1">$param.getName()</font></TD> 
+                                     <TD><input type="text" id=${dblQts}param[$c][0].value$dblQts  name=${dblQts}param[$c][0].value$dblQts value="$param.getValues().getUnique()"/></TD>
+                                      <input type="hidden"  id=${dblQts}param[$c].name.rowcount$dblQts name=${dblQts}param[$c].name.rowcount$dblQts value="1"/>    
+                                    </tr>
+                        #end
+                        #set ($c = $c + 1)
+                    #end        
+           
+      </TABLE>
+            <br/>
+
+
+
+<div id="roilabeldiv" class="hidden">
+
+      <table>
+          <TR><TD>ROI Labels must conform to the Clinical Trial protocols. Please Validate before anonymising</TD></>
+          
+      </TABLE>
+
+    <Table>
+    <tr >
+    <td width="200" style="font-size: 15px;font-weight: 600; text-align: center" >
+    Current</Td>
+    <td width="200" style="font-size: 15px;font-weight: 600; text-align: center" >
+    New</Td>
+
+    <td width="300" style="font-size: 15px;font-weight: 600; text-align: center" >
+    Permitted Labels</Td>
+
+    <td width="300" style="font-size: 15px;font-weight: 600; text-align: center" >
+    Required Labels
+    </td>
+    </tr>
+    </table>
+         <Table>
+                        <tr><td width="400" valign="top">
+                              
+                            <TABLE  id='label_table' >          
+                            </TABLE>
+                        </td><td width="300" valign="top">
+                               
+                           <TABLE>
+                              <ul id="permitted_labels_list" name="permitted_labels_list" style="overflow:hidden; height:500px; overflow-y:scroll;">
+                              </ul>
+                           </TABLE>
+                        </td><td width="300" valign="top">
+                              
+                           <TABLE>
+                              <ul id="required_labels_list" name="required_labels_list" style="overflow:hidden; height:500px; overflow-y:scroll;">
+                              </ul>
+                           </TABLE>
+                        </td></tr>
+
+                    </tr>
+                  <br/>
+        </TABLE>
+
+
+            <TABLE>
+                      <tr>  <TD align="center"> <input type="button" onclick="validateCT();" id="validate_button" name="validate_button" value="Validate"/></TD>
+                      </TR>
+        </TABLE>
+
+</div>
+</div>
+
+      <table>
+
+                <TR><TD><span id="messages" style="font-weight:bold"></span></TD></>
+                <TR><TD><span id="messages2" style="font-weight:bold"></span></TD></>
+      </TABLE>
+
+
+
+    <TABLE>
+              <TR style="display:none">
+              <TD><input type="checkbox" name="run_pipeline_in_process" /> <b>Run pipeline in-process?</b></TD>
+              </TR>
+              <TR style="display:none">
+              <TD><input type="checkbox" name="suppress_workflow_entries" /> <b>Suppress workflow entries for pipeline execution?</b></TD>
+              </TR>
+    </table>
+
+    <br/>
+
+</TABLE>
+
+
+
+  <table>
+                <TR><TD>####PATIENT DATA MUST NOT BE ENTERED IN THE FIELDS!!</TD></>
+          <TR>
+          <TD align="center"><input type="button" ONCLICK="javascript:window.close()" value="Close" />&nbsp;&nbsp;&nbsp;<input type="submit"  id="submit_button" name="eventSubmit_doLaunchpipeline" value="Pseudonymise Session" disabled=false></TD>
+          </TR>
+  </TABLE>
+
+
+
+
+  <input type="hidden" name="schema_type" value="$item.getXSIType()">
+  <input type="hidden" name="param_cnt" value="$c">
+  <input type="hidden" name="pipeline_path" value="$pipeline.getLocation()">
+
+  #xdatPassItemFormFields($search_element $search_field $search_value $project) 
+
+ </div>
+
+
+
+
+
+<script type="text/javascript" LANGUAGE="javascript" src="$content.getURI('scripts/clinical_trial.js')"></SCRIPT>
+
+<script type="text/javascript">
+
+function checkIDs(){
+          
+        var session_id1 = document.getElementById("param[4][0].value").value;
+        var subject_id2 = document.getElementById("param[5][0].value").value;
+
+        var session_id = session_id1.replace(/\s/g,"").replace(/[&\/\\#,+()$~%.'":*?<>{}£]/g, '');
+        var subject_id = subject_id2.replace(/\s/g,"").replace(/[&\/\\#,+()$~%.'":*?<>{}£]/g, '');
+        
+        document.getElementById("param[4][0].value").value = session_id;
+        document.getElementById("param[5][0].value").value = subject_id;
+
+
+}
+
+function setBenchmark(){
+          
+        var checkBox = document.getElementById("select_benchmark");
+        if (checkBox.checked == true){
+             document.getElementById("param[8][0].value").value = "0" 
+        } else {
+             document.getElementById("param[8][0].value").value = "1" 
+        }
+
+}
+
+function getLabels(){
+    var project = document.getElementById("param[2][0].value").value;
+    var session_label = document.getElementById("param[1][0].value").value;
+    var txtFile = new XMLHttpRequest();
+    var url = serverRoot + "/data/projects/" +  project + "/experiment/" ;
+    url = url + session_label + " resources/roi_labels/files/roi_labels.txt";
+    txtFile.open("GET", url , true);
+    txtFile.onreadystatechange = function() {
+      if (txtFile.readyState === 4) {  // Makes sure the document is ready to parse.
+        if (txtFile.status === 200) {  // Makes sure it's found the file.
+          allText = txtFile.responseText;
+          var labels = txtFile.responseText.split("\n"); // Will separate each line into an array
+        }
+      }
+      return labels;
+    }
+}
+
+function validateCT(){
+   var proj_name=document.getElementById("selectProject").value;
+   if (proj_name == "Select Pseudonymised Project"){          
+        document.getElementById("messages3").innerHTML="Select an Pseudonymised Project and retry";
+        return false;
+   }
+
+
+    var permitted_labels_list = document.getElementById("permitted_labels_list"); 
+    var new_labels = [];
+    var permitted_labels = [];
+    var required_labels = [];
+    var txtFile = new XMLHttpRequest();
+
+    var list = document.getElementById("permitted_labels_list")
+    var items = list.getElementsByTagName("li");
+    for (var j = 0; j < items.length; ++j) {
+       var val = items[j].innerText;
+       if (val.length > 0) {
+            permitted_labels.push(val);
+        }        
+    }
+
+    var req_list = document.getElementById("required_labels_list")
+    var req_items = req_list.getElementsByTagName("li");
+    for (var j = 0; j < req_items.length; ++j) {
+       var val = req_items[j].innerText;
+       if (val.length > 0) {
+            required_labels.push(val);
+        }        
+    }
+
+
+    var items = document.getElementsByClassName("new_label_class");
+    for (var j = 0; j < items.length; ++j) {
+       var val = items[j].value;
+       items[j].style.backgroundColor = "white";
+       if (val.length > 0) {
+            new_labels.push(val);
+        }
+        
+    }
+
+    
+    if (compare_arrays( new_labels, permitted_labels)) {
+        var session_id1 = document.getElementById("param[4][0].value").value;
+        var subject_id2 = document.getElementById("param[5][0].value").value;
+
+        var session_id = session_id1.replace(/[^A-Z0-9]/ig, "").replace(" ","");
+        var subject_id = subject_id2.replace(/[^A-Z0-9]/ig, "").replace(" ","");
+        
+        document.getElementById("param[4][0].value").value = session_id;
+        document.getElementById("param[5][0].value").value = subject_id;
+
+        if (check_ids(session_id, subject_id)){
+            document.getElementById("param[7][0].value").value = document.getElementById("selectProject").value;
+            document.getElementById("param[3][0].value").value = document.getElementById("selectClinicalTrial").value;
+            //csv list of roi labels
+            new_labels_csv = '';
+            for (var k = 0; k < new_labels.length; ++k){
+               if (k < 1){
+                   new_labels_csv = new_labels[k];
+               } else {
+                   new_labels_csv = new_labels_csv + ',' + new_labels[k];
+               }
+               
+            }
+            // document.getElementById("param[6][0].value").value = '"' + new_labels_csv + '"';
+            document.getElementById("param[6][0].value").value = new_labels_csv ;
+            document.getElementById("submit_button").disabled=false;
+
+
+
+            document.getElementById("messages").innerHTML="Success! Session conforms to the clincial trial protocol, click on Submit to pseudonymise session";
+            // do compare - SWAP order to make required labels check to see if maytch in new labels
+            if (required_labels_exist(  new_labels, required_labels)) {
+                document.getElementById("messages").innerHTML="Success! Session conforms to the clincial trial protocol and required labels are present, click on Submit to pseudonymise session";
+                return true;
+            } else {
+                document.getElementById("messages").innerHTML="Failed! Labels are permitted but not all required labels are present";
+                document.getElementById("submit_button").disabled=true;
+                return false;
+            }
+            
+        }
+        else {
+            document.getElementById("messages").innerHTML="Failed! Please ensure CT Subject and Session IDs conform (no spaces or special characters)";
+            return false;
+        }
+    } else {
+        document.getElementById("messages").innerHTML="Failed! Please ensure RT Struct labels are correct";
+        return false;
+    }
+
+
+}
+
+
+function check_ids(session_id, subject_id){
+    return true;
+
+}
+
+
+function matchRuleShort(str, rule) {
+  str = str.toLowerCase().replace(/\s/g, '').replace('-','');
+  rule = rule.toLowerCase().replace(/\s/g, '').replace('-','');
+
+  var escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
+}
+
+
+function tidyLabel(label, permitted_label) {
+   //return rule, unless rule contains wildacrd...
+   if (permitted_label.includes('*')) {
+     str = label.toLowerCase().replace(/\s/g, '').replace('-','');
+     rule = permitted_label.toLowerCase().replace(/\s/g, '').replace('-','');    
+     
+        
+
+     var i;
+     parts = rule.split('*');
+     for (i = 0; i < parts.length; i++) {
+        str = str.replace(parts[i],'');
+      } 
+
+      var new_permitted_label;  
+      new_permitted_label = permitted_label.replace('*', str);
+      return new_permitted_label;
+        
+   } else {
+       return permitted_label;
+   }
+   
+}
+
+
+
+function compare_arrays(new_labels, permitted_labels) {
+
+  var match_all=true;
+  var match=false;
+
+  for (var i = 0; i < new_labels.length; i++) {
+     match=false;
+     for (var ii = 0; ii < permitted_labels.length; ii++) { 
+
+        match_rule = matchRuleShort(new_labels[i] , permitted_labels[ii])
+
+        if (match_rule) {
+            match=true;
+            // make spaces and case correct
+            new_labels[i] = tidyLabel(new_labels[i],  permitted_labels[ii] )
+            //new_labels[i] = permitted_labels[ii] 
+        }
+     }
+     if (!match) {
+        var inputVal = document.getElementById("label_" + i);
+        inputVal.style.backgroundColor = "yellow";
+        match_all=false;
+     }
+  }
+  if (!match_all) {
+    return false;
+  }
+  return true;
+}
+
+
+function required_labels_exist(new_labels, required_labels) {
+
+  var match_all=true;
+  var match=false;
+
+  for (var i = 0; i < required_labels.length; i++) {
+     match=false;
+     for (var ii = 0; ii < new_labels.length; ii++) { 
+        match_rule = matchRuleShort(new_labels[ii] , required_labels[i])
+        if (match_rule) {     
+            match=true;
+            // make spaces and case correct
+            // new_labels[ii] = required_labels[i] no need done in permitted....
+        }
+     }
+     if (!match) {
+        var inputVal = document.getElementById("req_list_" + i);
+        inputVal.style.backgroundColor = "yellow";
+        match_all=false;
+     }
+  }
+  if (!match_all) {
+    return false;
+  }
+  return true;
+}
+
+
+
+
+</script>

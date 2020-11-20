@@ -1,0 +1,6 @@
+<!-- BEGIN: templates/screens/xnat_imageSessionData/actionsBox/AddclinicalTrial.vm -->
+<!-- Sequence: 2 -->
+<li class="yuimenuitem">
+    <a href="$link.setAction("XDATActionRouter").addPathInfo("xdataction","PipelineScreen_launch_pipeline").addPathInfo("search_element","${om.getXSIType()}").addPathInfo("search_field","${om.getXSIType()}.ID").addPathInfo("search_value","${om.getId()}").addPathInfo('popup','true').addPathInfo('project',$project)" target="_blank"><div class="ic_spacer">&nbsp;</div>Pseudonymise Session</A>
+</li>
+<!-- END: templates/screens/xnat_imageSessionData/actionsBox/AddclinicalTrial.vm -->

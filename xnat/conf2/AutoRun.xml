@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ pipeline: AutoRun.xml
+  ~ XNAT http://www.xnat.org
+  ~ Copyright (c) 2017, Washington University School of Medicine
+  ~ All Rights Reserved
+  ~
+  ~ Released under the Simplified BSD.
+  -->
+
+<Pipeline xmlns="http://nrg.wustl.edu/pipeline" xmlns:autorun="http://www.xnat.org/java/org.nrg.pipeline.client.webservices.WebserviceClient" xmlns:fileUtils="org.nrg.imagingtools.utils.FileUtils" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nrg.wustl.edu/pipeline ..\..\schema\pipeline.xsd">
+    <name>AutoRun</name>
+    <location>xnat_tools</location>
+    <description>Auto-Archive Pipeline for XNAT </description>
+    <outputFileNamePrefix>^concat(/Pipeline/parameters/parameter[name='cachepath']/values/unique/text(),/Pipeline/parameters/parameter[name='label']/values/unique/text(),'/',/Pipeline/name/text())^</outputFileNamePrefix>
+    <parameters>
+        <parameter>
+            <name>resolvedHost</name>
+            <values>
+                <unique>^if (boolean(/Pipeline/parameters/parameter[name='aliasHost']/values/unique)) then /Pipeline/parameters/parameter[name='aliasHost']/values/unique/text() else /Pipeline/parameters/parameter[name='host']/values/unique/text()^</unique>
+            </values>
+            <description>Use aliasHost if it exists, or host if not</description>
+        </parameter>
+        <parameter>
+            <name>cachepath</name>
+            <values>
+                <unique>^fileUtils:GetCachePath(/Pipeline/parameters/parameter[name='resolvedHost']/values/unique/text(), /Pipeline/parameters/parameter[name='user']/values/unique/text(), /Pipeline/parameters/parameter[name='pwd']/values/unique/text(),/Pipeline/parameters/parameter[name='project']/values/unique/text())^</unique>
+            </values>
+            <description>Project specific cachepath</description>
+        </parameter>
+    </parameters>
+    <steps>
+        <step continueOnFailure="true" description="Create Quality Control Images" id="SNAPSHOTS">
+            <resource location="images/resources" name="WebBasedQCImageCreator">
+                <argument id="session">
+                    <value>^/Pipeline/parameters/parameter[name='label']/values/unique/text()^</value>
+                </argument>
+                <argument id="xnatId">
+                    <value>^/Pipeline/parameters/parameter[name='id']/values/unique/text()^</value>
+                </argument>
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='project']/values/unique/text()^</value>
+                </argument>
+                <argument id="host">
+                    <value>^/Pipeline/parameters/parameter[name='resolvedHost']/values/unique/text()^</value>
+                </argument>
+                <argument id="user">
+                    <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                </argument>
+                <argument id="pwd">
+                    <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                </argument>
+                <argument id="raw"/>
+            </resource>
+        </step>
+        <step continueOnFailure="true" description="Insert UIDs into catalog files" id="UIDS">
+            <resource location="/data/xnat/scripts/pipelines/" name="insert_uids">
+                <argument id="session">
+                    <value>^/Pipeline/parameters/parameter[name='label']/values/unique/text()^</value>
+                </argument>
+                <argument id="project">
+                    <value>^/Pipeline/parameters/parameter[name='project']/values/unique/text()^</value>
+                </argument>
+            </resource>
+        </step>
+        <step description="Launch auto-run pipelines" id="LAUNCH_PIPELINES">
+            <resource location="xnat_tools" name="XnatDataClient">
+                <argument id="user">
+                    <value>^/Pipeline/parameters/parameter[name='user']/values/unique/text()^</value>
+                </argument>
+                <argument id="password">
+                    <value>^/Pipeline/parameters/parameter[name='pwd']/values/unique/text()^</value>
+                </argument>
+                <argument id="method">
+                    <value>POST</value>
+                </argument>
+                <argument id="remote">
+                    <value>^concat('"',/Pipeline/parameters/parameter[name='resolvedHost']/values/unique/text(),'/data/projects/',/Pipeline/parameters/parameter[name='project']/values/unique/text(),'/pipelines/AUTO_ARCHIVE/experiments/',/Pipeline/parameters/parameter[name='session']/values/unique/text(),'?match=LIKE"')^</value>
+                </argument>
+            </resource>
+        </step>
+    </steps>
+</Pipeline>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pip:Resource xmlns:pip="http://nrg.wustl.edu/pipeline">
+	<pip:name>delete_dicom_files.sh</pip:name>
+	<pip:location>/opt/scripts</pip:location>
+	<pip:type>Executable</pip:type>
+	<pip:description>
+		Deletes dicom files for either one sesison or all sessions
+	</pip:description>
+	<pip:input>
+		<pip:argument id="project">
+			
+			<pip:description>XNAT Project ID to which the Session belongs</pip:description>
+		</pip:argument>
+
+		<pip:argument id="sessionlabel">
+			
+			<pip:description>Project session ID</pip:description>
+		</pip:argument>
+
+				<pip:argument id="deleteall">
+			
+			<pip:description>delete all files in XNAT</pip:description>
+		</pip:argument>
+
+
+
+	</pip:input>
+</pip:Resource>
